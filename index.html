@@ -18,12 +18,15 @@
             min-height: 100vh;
             padding: 10px;
             overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .container {
             max-width: 400px;
             margin: 0 auto;
             text-align: center;
+            padding-bottom: 50px;
         }
         
         .header {
@@ -208,7 +211,7 @@
         
         @media (max-width: 480px) {
             .container {
-                padding: 5px;
+                padding: 5px 5px 80px 5px;
             }
             
             .logo {
@@ -223,6 +226,16 @@
                 min-width: 120px;
                 padding: 12px 20px;
                 font-size: 14px;
+            }
+            
+            .instructions, .results, .debug-info {
+                margin: 15px 0;
+                max-height: none;
+            }
+            
+            .footer {
+                margin-top: 30px;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -877,13 +890,33 @@
             }
         });
 
-        // タッチイベント最適化
+        // タッチイベント最適化とスクロール問題解決
         document.addEventListener('touchstart', function() {}, {passive: true});
         document.addEventListener('touchmove', function(e) {
-            if (e.target.tagName !== 'VIDEO') {
-                e.preventDefault();
+            // ビデオ以外ではスクロールを許可
+            if (e.target.tagName !== 'VIDEO' && e.target.tagName !== 'CANVAS') {
+                return true;
             }
-        }, {passive: false});
+        }, {passive: true});
+
+        // iOS Safari のスクロール問題解決
+        document.addEventListener('DOMContentLoaded', function() {
+            // body の高さを動的に調整
+            function adjustBodyHeight() {
+                const container = document.querySelector('.container');
+                const bodyHeight = container.scrollHeight + 100;
+                document.body.style.minHeight = bodyHeight + 'px';
+            }
+            
+            // 初期調整
+            setTimeout(adjustBodyHeight, 1000);
+            
+            // 画面サイズ変更時に再調整
+            window.addEventListener('resize', adjustBodyHeight);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(adjustBodyHeight, 500);
+            });
+        });
 
         // オリエンテーション変更対応
         window.addEventListener('orientationchange', function() {
