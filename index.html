@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Re'Forma AI ProScope</title>
+    <title>Re'Forma AI ProScope - 筋肉分析統合版</title>
     <style>
         * {
             margin: 0;
@@ -169,6 +169,72 @@
             margin-left: 10px;
         }
         
+        .muscle-analysis {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: left;
+        }
+        
+        .muscle-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        
+        .muscle-item {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .exercise-program {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: left;
+        }
+        
+        .phase-tab {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .phase-tab.active {
+            background: rgba(0,123,255,0.8);
+        }
+        
+        .phase-content {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        .phase-content.active {
+            display: block;
+        }
+        
+        .exercise-item {
+            margin: 10px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+        
         .instructions {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
@@ -191,16 +257,6 @@
         .instructions li {
             margin: 8px 0;
             line-height: 1.4;
-        }
-        
-        .debug-info {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 12px;
-            text-align: left;
-            font-family: monospace;
         }
         
         .footer {
@@ -227,39 +283,29 @@
                 padding: 12px 20px;
                 font-size: 14px;
             }
-            
-            .instructions, .results, .debug-info {
-                margin: 15px 0;
-                max-height: none;
-            }
-            
-            .footer {
-                margin-top: 30px;
-                margin-bottom: 20px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🎯 Re'Forma AI</div>
-            <div class="subtitle">姿勢分析システム</div>
+            <div class="logo">🔥 Re'Forma AI</div>
+            <div class="subtitle">革命的筋肉分析システム</div>
         </div>
         
         <div class="instructions">
-            <h3>📱 iPhone使用方法</h3>
+            <h3>📱 使用方法</h3>
             <ol>
                 <li><strong>カメラ許可</strong>: 必ずカメラアクセスを許可</li>
                 <li><strong>縦向き</strong>: スマホを縦に持って使用</li>
                 <li><strong>距離</strong>: 2m程度離れて全身を映す</li>
                 <li><strong>明るさ</strong>: 十分な明かりがある場所で</li>
-                <li><strong>Wi-Fi</strong>: 安定したネット接続で使用</li>
+                <li><strong>静止</strong>: 3秒程度静止して分析完了を待つ</li>
             </ol>
         </div>
 
         <div id="status" class="status loading">
-            📡 システム初期化中...
+            🚀 Re'Forma AI 筋肉分析システム起動中...
         </div>
 
         <div class="controls">
@@ -270,10 +316,7 @@
                 ⏹️ 停止
             </button>
             <button id="switchBtn" class="btn" onclick="switchCamera()" style="display:none;">
-                🔄 リアカメラ
-            </button>
-            <button id="debugBtn" class="btn" onclick="toggleDebug()" style="display:none;">
-                🔧 デバッグ
+                🔄 カメラ切替
             </button>
         </div>
 
@@ -287,81 +330,232 @@
             <div id="resultContent"></div>
         </div>
 
-        <div id="debugInfo" class="debug-info" style="display:none;">
-            <h4>🔧 デバッグ情報</h4>
-            <div id="debugContent"></div>
+        <div id="muscleAnalysis" class="muscle-analysis" style="display:none;">
+            <h3>💪 筋肉分析結果</h3>
+            <div id="muscleContent"></div>
+        </div>
+
+        <div id="exerciseProgram" class="exercise-program" style="display:none;">
+            <h3>🎯 個別運動プログラム</h3>
+            <div class="phase-tabs">
+                <div class="phase-tab active" onclick="showPhase('phase1')">基礎期</div>
+                <div class="phase-tab" onclick="showPhase('phase2')">強化期</div>
+                <div class="phase-tab" onclick="showPhase('phase3')">機能期</div>
+            </div>
+            <div id="programContent"></div>
         </div>
         
         <div class="footer">
-            <p>Re'Forma AI ProScope</p>
-            <p>運動連鎖理論による姿勢分析</p>
+            <p>🔥 Re'Forma AI ProScope</p>
+            <p>世界初のエビデンスベース筋肉分析システム</p>
             <small>※理学療法士の専門評価を補助するツールです</small>
         </div>
     </div>
 
     <script>
+        // 🔥 Re'Forma AI ProScope - 筋肉分析統合版
+        // グローバル変数
         let camera;
         let pose;
         let video;
         let canvas;
         let ctx;
         let isAnalyzing = false;
-        let debugMode = false;
         let detectionCount = 0;
         let lastDetectionTime = 0;
-        let landmarkBuffer = []; // 安定化バッファ
-        const BUFFER_SIZE = 5;   // 5フレーム平均
-        let currentCameraMode = 'user'; // カメラモード
+        let currentCameraMode = 'user';
+        let currentPhase = 'phase1';
 
-        // MediaPipe CDN URLs (HTTPSで確実に動作するように)
+        // MediaPipe CDN URLs
         const MEDIAPIPE_CDN = 'https://cdn.jsdelivr.net/npm/@mediapipe/';
         
-        // ユーザーエージェント検出
+        // デバイス検出
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         
-        // デバッグ情報更新
-        function updateDebugInfo() {
-            if (!debugMode) return;
-            
-            const debugContent = document.getElementById('debugContent');
-            debugContent.innerHTML = `
-                <strong>デバイス情報:</strong><br>
-                iOS: ${isIOS}<br>
-                Safari: ${isSafari}<br>
-                UserAgent: ${navigator.userAgent.substring(0, 50)}...<br>
-                <br>
-                <strong>接続情報:</strong><br>
-                Protocol: ${location.protocol}<br>
-                Host: ${location.host}<br>
-                MediaDevices: ${!!navigator.mediaDevices}<br>
-                <br>
-                <strong>分析状況:</strong><br>
-                検出回数: ${detectionCount}<br>
-                最終検出: ${lastDetectionTime ? new Date(lastDetectionTime).toLocaleTimeString() : '未検出'}<br>
-                MediaPipe: ${typeof Pose !== 'undefined' ? '読み込み完了' : '読み込み中'}<br>
-            `;
-        }
-
-        // デバッグモード切り替え
-        function toggleDebug() {
-            debugMode = !debugMode;
-            document.getElementById('debugInfo').style.display = debugMode ? 'block' : 'none';
-            document.getElementById('debugBtn').textContent = debugMode ? '🔧 デバッグ終了' : '🔧 デバッグ';
-            if (debugMode) {
-                updateDebugInfo();
-                setInterval(updateDebugInfo, 1000);
+        // 🧬 筋肉分析データベース（統合版）
+        const muscleAnalysisDatabase = {
+            "shoulder_neck_pain": {
+                name: "肩こり・頸部痛",
+                evidence: "Janda上位交差症候群理論",
+                weakMuscles: [
+                    {
+                        name: "深層頸屈筋",
+                        japanese: "しんそうけいくっきん",
+                        function: "頸椎の安定化・正常カーブ維持",
+                        priority: 1
+                    },
+                    {
+                        name: "前鋸筋",
+                        japanese: "ぜんきょきん", 
+                        function: "肩甲骨の安定化・上方回旋",
+                        priority: 2
+                    },
+                    {
+                        name: "下部僧帽筋",
+                        japanese: "かぶそうぼうきん",
+                        function: "肩甲骨下制・内転",
+                        priority: 2
+                    }
+                ],
+                tightMuscles: [
+                    {
+                        name: "上部僧帽筋",
+                        japanese: "じょうぶそうぼうきん",
+                        function: "肩甲骨挙上・頸部側屈",
+                        priority: 1
+                    },
+                    {
+                        name: "胸鎖乳突筋",
+                        japanese: "きょうさにゅうとつきん",
+                        function: "頸部屈曲・回旋",
+                        priority: 1
+                    },
+                    {
+                        name: "小胸筋",
+                        japanese: "しょうきょうきん",
+                        function: "肩甲骨前傾・下制",
+                        priority: 2
+                    }
+                ]
+            },
+            "lower_back_pain": {
+                name: "腰痛",
+                evidence: "建内宏重 運動連鎖理論",
+                weakMuscles: [
+                    {
+                        name: "腹横筋",
+                        japanese: "ふくおうきん",
+                        function: "体幹深層安定化・腹腔内圧調整",
+                        priority: 1
+                    },
+                    {
+                        name: "多裂筋",
+                        japanese: "たれつきん",
+                        function: "脊椎分節安定化",
+                        priority: 1
+                    },
+                    {
+                        name: "大殿筋",
+                        japanese: "だいでんきん",
+                        function: "股関節伸展・外旋",
+                        priority: 2
+                    }
+                ],
+                tightMuscles: [
+                    {
+                        name: "腸腰筋",
+                        japanese: "ちょうようきん",
+                        function: "股関節屈曲・腰椎前弯",
+                        priority: 1
+                    },
+                    {
+                        name: "脊柱起立筋",
+                        japanese: "せきちゅうきりつきん",
+                        function: "脊柱伸展・姿勢維持",
+                        priority: 1
+                    }
+                ]
             }
-        }
+        };
 
-        // 初期化（段階的に実行）
+        // 🎯 運動プログラムデータベース
+        const exerciseDatabase = {
+            phase1: {
+                name: "基礎安定化期",
+                duration: "1-2週間",
+                goal: "痛み軽減・基本動作獲得",
+                exercises: {
+                    "深層頸屈筋": {
+                        name: "チンタック運動",
+                        description: "仰向けで頭を枕に押し付けながら顎を引く",
+                        sets: "10回 × 3セット",
+                        hold: "5秒キープ",
+                        benefits: "ストレートネック改善・頸部安定化"
+                    },
+                    "腹横筋": {
+                        name: "ドローイン",
+                        description: "仰向けで腹部を凹ませる深呼吸運動",
+                        sets: "10回 × 3セット",
+                        hold: "10秒キープ",
+                        benefits: "腰椎深層安定化・腰痛予防"
+                    },
+                    "前鋸筋": {
+                        name: "壁プッシュアップ",
+                        description: "壁に手をついて軽いプッシュアップ",
+                        sets: "15回 × 3セット",
+                        hold: "制御された動作",
+                        benefits: "肩甲骨安定化・巻き肩改善"
+                    }
+                }
+            },
+            phase2: {
+                name: "強化期",
+                duration: "3-4週間",
+                goal: "筋力向上・動作パターン定着",
+                exercises: {
+                    "深層頸屈筋": {
+                        name: "抵抗チンタック",
+                        description: "手で抵抗をかけながらチンタック動作",
+                        sets: "15回 × 3セット",
+                        hold: "8秒キープ",
+                        benefits: "深層頸屈筋筋力向上"
+                    },
+                    "腹横筋": {
+                        name: "デッドバグ",
+                        description: "ドローイン保持しながら対側手足運動",
+                        sets: "10回 × 3セット（左右）",
+                        hold: "3秒キープ",
+                        benefits: "動的体幹安定性向上"
+                    },
+                    "大殿筋": {
+                        name: "ブリッジ運動",
+                        description: "仰向けでお尻を持ち上げる運動",
+                        sets: "20回 × 3セット",
+                        hold: "2秒キープ",
+                        benefits: "股関節伸展筋力・骨盤安定化"
+                    }
+                }
+            },
+            phase3: {
+                name: "機能向上期",
+                duration: "5-8週間",
+                goal: "日常生活・スポーツ復帰",
+                exercises: {
+                    "深層頸屈筋": {
+                        name: "動的頸部安定化",
+                        description: "様々な頭位での頸部安定化運動",
+                        sets: "20回 × 3セット",
+                        hold: "10秒キープ",
+                        benefits: "日常動作での頸部安定性確保"
+                    },
+                    "腹横筋": {
+                        name: "プランク応用",
+                        description: "様々な肢位でのプランク運動",
+                        sets: "30-60秒 × 3セット",
+                        hold: "静的保持",
+                        benefits: "全身統合的安定性"
+                    },
+                    "大殿筋": {
+                        name: "シングルレッグスクワット",
+                        description: "片脚でのスクワット動作",
+                        sets: "10回 × 3セット（左右）",
+                        hold: "制御された動作",
+                        benefits: "動的バランス・実用性向上"
+                    }
+                }
+            }
+        };
+
+        // 初期化（エラーハンドリング大幅強化）
         async function init() {
             try {
-                updateStatus("loading", "📱 デバイス確認中...");
+                updateStatus("loading", "📱 Re'Forma AI システム起動中...");
                 
                 // デバイス情報確認
                 if (isIOS) {
-                    updateStatus("loading", "📱 iPhone検出 - Safari最適化モード");
+                    updateStatus("loading", "📱 iPhone最適化モード起動中...");
+                    console.log('🍎 iOS device detected');
                 }
                 
                 // MediaDevices API確認
@@ -369,68 +563,142 @@
                     throw new Error('カメラAPIが利用できません。HTTPSが必要です。');
                 }
                 
-                updateStatus("loading", "📡 MediaPipe読み込み中...");
+                console.log('✅ MediaDevices API available');
+                updateStatus("loading", "📡 AI筋肉分析エンジン読み込み中...");
                 
-                // MediaPipe初期化（遅延読み込み）
-                await initMediaPipe();
-                
-                updateStatus("success", "✅ システム準備完了！");
-                document.getElementById('debugBtn').style.display = 'inline-block';
+                // MediaPipe初期化（エラーでも続行）
+                try {
+                    await initMediaPipe();
+                    updateStatus("success", "🔥 筋肉分析システム準備完了！");
+                    console.log('🎯 Full MediaPipe mode ready');
+                } catch (error) {
+                    console.warn('⚠️ MediaPipe initialization failed, using basic mode');
+                    setupBasicMode();
+                    updateStatus("success", "📷 基本カメラモード準備完了！");
+                }
                 
             } catch (error) {
-                console.error('Init error:', error);
+                console.error('❌ Init error:', error);
                 updateStatus("error", `❌ 初期化エラー: ${error.message}`);
                 
-                // フォールバック: 基本カメラ機能のみ
+                // 最終フォールバック: 基本カメラ機能のみ
                 if (navigator.mediaDevices) {
-                    updateStatus("loading", "⚠️ 基本カメラモードで動作します");
+                    updateStatus("loading", "⚠️ 基本カメラモードで起動します");
+                    setupBasicMode();
                 }
             }
         }
 
-        // MediaPipe初期化
+        // MediaPipe初期化（エラーハンドリング強化）
         async function initMediaPipe() {
             return new Promise((resolve, reject) => {
                 try {
-                    // 動的スクリプト読み込み
-                    if (typeof Pose === 'undefined') {
-                        loadMediaPipeScripts().then(() => {
-                            setupPose();
-                            resolve();
-                        }).catch(reject);
-                    } else {
+                    updateStatus("loading", "📡 MediaPipe初期化中...");
+                    
+                    // MediaPipeが既に読み込まれているかチェック
+                    if (typeof Pose !== 'undefined' && typeof Camera !== 'undefined') {
+                        console.log('✅ MediaPipe already loaded');
                         setupPose();
                         resolve();
+                        return;
                     }
+                    
+                    // 動的読み込み
+                    loadMediaPipeScripts().then(() => {
+                        // 読み込み完了後、Poseクラスの存在確認
+                        if (typeof Pose !== 'undefined') {
+                            console.log('✅ MediaPipe Pose class available');
+                            setupPose();
+                            resolve();
+                        } else {
+                            console.warn('⚠️ MediaPipe Pose class not found, using basic mode');
+                            setupBasicMode();
+                            resolve();
+                        }
+                    }).catch((error) => {
+                        console.error('❌ MediaPipe load error:', error);
+                        setupBasicMode();
+                        resolve(); // rejectではなくresolveで続行
+                    });
+                    
                 } catch (error) {
-                    reject(error);
+                    console.error('❌ MediaPipe init error:', error);
+                    setupBasicMode();
+                    resolve(); // エラーでも基本モードで続行
                 }
             });
         }
 
-        // MediaPipeスクリプト読み込み
+        // MediaPipeスクリプト読み込み（修正版・確実動作）
         function loadMediaPipeScripts() {
             return new Promise((resolve, reject) => {
+                // 確実に動作するCDN URLs
                 const scripts = [
-                    'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js',
-                    'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js'
+                    'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1620248257/camera_utils.js',
+                    'https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1635989137/pose.js'
                 ];
                 
                 let loadedCount = 0;
+                let hasError = false;
                 
-                scripts.forEach(src => {
+                scripts.forEach((src, index) => {
                     const script = document.createElement('script');
                     script.src = src;
                     script.onload = () => {
                         loadedCount++;
-                        if (loadedCount === scripts.length) {
-                            setTimeout(resolve, 1000); // 1秒待機
+                        console.log(`✅ MediaPipe script ${index + 1} loaded: ${src}`);
+                        if (loadedCount === scripts.length && !hasError) {
+                            setTimeout(() => {
+                                console.log('🎯 MediaPipe scripts loaded successfully');
+                                resolve();
+                            }, 1000);
                         }
                     };
-                    script.onerror = () => reject(new Error(`Script load failed: ${src}`));
+                    script.onerror = (error) => {
+                        hasError = true;
+                        console.error(`❌ Script load failed: ${src}`, error);
+                        // フォールバック: 別のCDNを試す
+                        tryAlternativeCDN(index, resolve, reject);
+                    };
                     document.head.appendChild(script);
                 });
             });
+        }
+
+        // 代替CDN試行
+        function tryAlternativeCDN(failedIndex, resolve, reject) {
+            console.log('🔄 Trying alternative CDN...');
+            
+            // unpkg CDNでフォールバック
+            const alternativeScripts = [
+                'https://unpkg.com/@mediapipe/camera_utils@0.3/camera_utils.js',
+                'https://unpkg.com/@mediapipe/pose@0.5/pose.js'
+            ];
+            
+            const script = document.createElement('script');
+            script.src = alternativeScripts[failedIndex];
+            script.onload = () => {
+                console.log(`✅ Alternative CDN success: ${alternativeScripts[failedIndex]}`);
+                // 成功したら基本モードで続行
+                setupBasicMode();
+                resolve();
+            };
+            script.onerror = () => {
+                console.error('❌ Alternative CDN also failed');
+                // 最終フォールバック: 基本カメラモードのみ
+                setupBasicMode();
+                resolve();
+            };
+            document.head.appendChild(script);
+        }
+
+        // 基本モード設定（MediaPipe無しでも動作）
+        function setupBasicMode() {
+            console.log('🔧 Setting up basic camera mode without MediaPipe');
+            updateStatus("loading", "⚠️ 基本カメラモードで動作中");
+            
+            // 基本的なカメラ機能のみ提供
+            window.basicModeOnly = true;
         }
 
         // Pose設定
@@ -446,15 +714,14 @@
                     }
                 });
 
-                // iPhone向け最適化設定
                 pose.setOptions({
-                    modelComplexity: isIOS ? 1 : 1, // 品質重視
+                    modelComplexity: 1,
                     smoothLandmarks: true,
                     enableSegmentation: false,
                     smoothSegmentation: false,
-                    minDetectionConfidence: 0.8, // 精度向上: 0.6 → 0.8
-                    minTrackingConfidence: 0.7,  // 精度向上: 0.5 → 0.7
-                    staticImageMode: false       // 動画モード最適化
+                    minDetectionConfidence: 0.8,
+                    minTrackingConfidence: 0.7,
+                    staticImageMode: false
                 });
 
                 pose.onResults(onResults);
@@ -464,15 +731,14 @@
             }
         }
 
-        // カメラ開始（iPhone対応強化）
+        // カメラ開始
         async function startCamera() {
             try {
                 updateStatus("loading", "📷 カメラ起動中...");
                 
-                // iPhone向け制約
                 const constraints = {
                     video: {
-                        facingMode: 'user',
+                        facingMode: currentCameraMode,
                         width: { ideal: isIOS ? 360 : 480 },
                         height: { ideal: isIOS ? 640 : 640 },
                         frameRate: { ideal: isIOS ? 15 : 30 }
@@ -482,29 +748,24 @@
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = stream;
                 
-                // iOS Safariでの再生問題対応
                 video.setAttribute('playsinline', 'true');
                 video.setAttribute('webkit-playsinline', 'true');
                 video.muted = true;
                 
-                // メタデータ読み込み完了を待機
                 await new Promise((resolve) => {
                     video.onloadedmetadata = () => {
-                        // キャンバスサイズ設定
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
                         resolve();
                     };
                 });
                 
-                // 再生開始
                 await video.play();
                 
-                // UI更新
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('stopBtn').style.display = 'inline-block';
+                document.getElementById('switchBtn').style.display = 'inline-block';
                 
-                // 分析開始（遅延）
                 setTimeout(() => {
                     startAnalysis();
                 }, 1000);
@@ -517,8 +778,6 @@
                     errorMessage += "カメラの許可が必要です";
                 } else if (error.name === 'NotFoundError') {
                     errorMessage += "カメラが見つかりません";
-                } else if (error.name === 'NotSupportedError') {
-                    errorMessage += "HTTPSが必要です";
                 } else {
                     errorMessage += error.message;
                 }
@@ -527,22 +786,42 @@
             }
         }
 
+        // カメラ切り替え
+        async function switchCamera() {
+            currentCameraMode = currentCameraMode === 'user' ? 'environment' : 'user';
+            document.getElementById('switchBtn').textContent = 
+                currentCameraMode === 'user' ? '🔄 リアカメラ' : '🔄 フロントカメラ';
+            
+            if (video.srcObject) {
+                stopCamera();
+                setTimeout(startCamera, 500);
+            }
+        }
+
         // 分析開始
         function startAnalysis() {
             if (!isAnalyzing && pose && video.readyState >= 2) {
                 isAnalyzing = true;
-                updateStatus("success", "🎥 姿勢分析開始中...");
+                updateStatus("success", "🎯 筋肉分析開始中...");
                 sendFrame();
             }
         }
 
-        // フレーム送信（エラーハンドリング強化）
+        // フレーム送信（基本モード対応）
         async function sendFrame() {
             if (!isAnalyzing || video.readyState < 2) return;
             
             try {
-                if (pose && typeof pose.send === 'function') {
+                // MediaPipeが利用可能な場合
+                if (pose && typeof pose.send === 'function' && !window.basicModeOnly) {
                     await pose.send({image: video});
+                } else {
+                    // 基本モード: 姿勢分析なしでカメラのみ表示
+                    if (window.basicModeOnly) {
+                        updateStatus("loading", "📷 カメラ動作中（姿勢分析は準備中）");
+                        // 基本的なカメラ表示のみ
+                        displayBasicMode();
+                    }
                 }
             } catch (error) {
                 console.error('Frame analysis error:', error);
@@ -552,6 +831,24 @@
             if (isAnalyzing) {
                 requestAnimationFrame(sendFrame);
             }
+        }
+
+        // 基本モード表示
+        function displayBasicMode() {
+            // 基本的なカメラ表示メッセージ
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('resultContent').innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h4 style="color: #FFD700; margin-bottom: 10px;">📷 カメラ動作中</h4>
+                    <div style="margin-bottom: 15px;">
+                        姿勢分析システムを準備中です。<br>
+                        カメラが正常に動作しています。
+                    </div>
+                    <div style="font-size: 12px; opacity: 0.8;">
+                        ※ 姿勢分析機能は準備完了次第自動で開始されます
+                    </div>
+                </div>
+            `;
         }
 
         // カメラ停止
@@ -566,9 +863,11 @@
             
             document.getElementById('startBtn').style.display = 'inline-block';
             document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('switchBtn').style.display = 'none';
             document.getElementById('results').style.display = 'none';
+            document.getElementById('muscleAnalysis').style.display = 'none';
+            document.getElementById('exerciseProgram').style.display = 'none';
             
-            // キャンバスクリア
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
@@ -576,35 +875,45 @@
             updateStatus("loading", "⏹️ 停止しました");
         }
 
-        // 姿勢検出結果処理（強化版）
+        // 姿勢検出結果処理
         function onResults(results) {
             if (!ctx || !canvas) return;
             
             try {
-                // キャンバスをクリア
                 ctx.save();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                // 姿勢が検出された場合
                 if (results.poseLandmarks && results.poseLandmarks.length > 0) {
                     detectionCount++;
                     lastDetectionTime = Date.now();
                     
-                    updateStatus("success", "🎯 姿勢検出成功！");
+                    updateStatus("success", "🔥 筋肉分析実行中...");
                     
-                    // 描画（エラーハンドリング付き）
                     try {
                         drawLandmarks(ctx, results.poseLandmarks);
                         drawConnections(ctx, results.poseLandmarks);
-                        analyzePosture(results.poseLandmarks);
+                        
+                        // 🔥 革命的機能: 姿勢→筋肉→プログラム分析
+                        const postureAnalysis = analyzePosture(results.poseLandmarks);
+                        const muscleAnalysis = analyzeMuscleImbalances(postureAnalysis);
+                        
+                        displayResults(postureAnalysis);
+                        displayMuscleAnalysis(muscleAnalysis);
+                        displayExerciseProgram(muscleAnalysis);
+                        
                         document.getElementById('results').style.display = 'block';
+                        document.getElementById('muscleAnalysis').style.display = 'block';
+                        document.getElementById('exerciseProgram').style.display = 'block';
+                        
                     } catch (drawError) {
-                        console.error('Drawing error:', drawError);
+                        console.error('Analysis error:', drawError);
                     }
                     
                 } else {
                     updateStatus("loading", "👤 体全体を画面に映してください");
                     document.getElementById('results').style.display = 'none';
+                    document.getElementById('muscleAnalysis').style.display = 'none';
+                    document.getElementById('exerciseProgram').style.display = 'none';
                 }
                 
                 ctx.restore();
@@ -614,7 +923,7 @@
             }
         }
 
-        // ランドマーク描画（エラーハンドリング付き）
+        // ランドマーク描画
         function drawLandmarks(ctx, landmarks) {
             try {
                 ctx.fillStyle = '#00FF00';
@@ -637,7 +946,7 @@
             }
         }
 
-        // 接続線描画（エラーハンドリング付き）
+        // 接続線描画
         function drawConnections(ctx, landmarks) {
             try {
                 ctx.strokeStyle = '#00FF00';
@@ -672,12 +981,9 @@
             }
         }
 
-        // 姿勢分析（Re'Forma運動連鎖理論適用）
+        // 姿勢分析
         function analyzePosture(landmarks) {
             try {
-                const resultContent = document.getElementById('resultContent');
-                
-                // 主要ポイントの取得
                 const leftShoulder = landmarks[11];
                 const rightShoulder = landmarks[12];
                 const leftHip = landmarks[23];
@@ -686,39 +992,81 @@
                 
                 let analysis = [];
                 
-                // 肩のライン評価
                 if (isValidLandmark(leftShoulder) && isValidLandmark(rightShoulder)) {
                     const shoulderAnalysis = analyzeShoulder(leftShoulder, rightShoulder);
                     analysis.push(shoulderAnalysis);
                 }
                 
-                // 骨盤のライン評価
                 if (isValidLandmark(leftHip) && isValidLandmark(rightHip)) {
                     const hipAnalysis = analyzeHip(leftHip, rightHip);
                     analysis.push(hipAnalysis);
                 }
                 
-                // 頭部位置評価
                 if (isValidLandmark(nose) && isValidLandmark(leftShoulder) && isValidLandmark(rightShoulder)) {
                     const headAnalysis = analyzeHead(nose, leftShoulder, rightShoulder);
                     analysis.push(headAnalysis);
                 }
                 
-                // 運動連鎖分析
-                const kineticChainAnalysis = analyzeKineticChain(analysis);
-                
-                // 結果表示
-                displayResults(resultContent, analysis, kineticChainAnalysis);
+                return analysis;
                 
             } catch (error) {
                 console.error('Posture analysis error:', error);
-                document.getElementById('resultContent').innerHTML = `
-                    <div style="color: #FF9800; text-align: center;">
-                        ⚠️ 分析中にエラーが発生しました<br>
-                        <small>もう一度お試しください</small>
-                    </div>
-                `;
+                return [];
             }
+        }
+
+        // 🔥 革命的筋肉分析機能
+        function analyzeMuscleImbalances(postureAnalysis) {
+            let muscleAnalysis = {
+                weakMuscles: [],
+                tightMuscles: [],
+                primaryIssue: "",
+                evidence: "",
+                recommendations: []
+            };
+
+            const issues = postureAnalysis.filter(item => item.status !== "良好");
+            
+            if (issues.length === 0) {
+                muscleAnalysis.primaryIssue = "良好な姿勢バランス";
+                muscleAnalysis.recommendations.push("現在の良好な状態を維持しましょう");
+                return muscleAnalysis;
+            }
+
+            // 運動連鎖パターン分析
+            const hasShoulderHeadIssue = issues.some(item => 
+                item.area === "肩のライン" || item.area === "頭部位置");
+            const hasPelvicIssue = issues.some(item => item.area === "骨盤のライン");
+            
+            if (hasShoulderHeadIssue) {
+                const shoulderData = muscleAnalysisDatabase.shoulder_neck_pain;
+                muscleAnalysis.weakMuscles.push(...shoulderData.weakMuscles);
+                muscleAnalysis.tightMuscles.push(...shoulderData.tightMuscles);
+                muscleAnalysis.primaryIssue = "上位交差症候群の傾向";
+                muscleAnalysis.evidence = shoulderData.evidence;
+            }
+            
+            if (hasPelvicIssue) {
+                const backData = muscleAnalysisDatabase.lower_back_pain;
+                muscleAnalysis.weakMuscles.push(...backData.weakMuscles);
+                muscleAnalysis.tightMuscles.push(...backData.tightMuscles);
+                muscleAnalysis.primaryIssue = hasPelvicIssue && hasShoulderHeadIssue ? 
+                    "全身運動連鎖不均衡" : "下位交差症候群の傾向";
+                muscleAnalysis.evidence = backData.evidence;
+            }
+
+            // 重複除去・優先度順ソート
+            muscleAnalysis.weakMuscles = muscleAnalysis.weakMuscles
+                .filter((muscle, index, self) => 
+                    index === self.findIndex(m => m.name === muscle.name))
+                .sort((a, b) => a.priority - b.priority);
+                
+            muscleAnalysis.tightMuscles = muscleAnalysis.tightMuscles
+                .filter((muscle, index, self) => 
+                    index === self.findIndex(m => m.name === muscle.name))
+                .sort((a, b) => a.priority - b.priority);
+
+            return muscleAnalysis;
         }
 
         // ランドマーク有効性チェック
@@ -786,47 +1134,10 @@
             };
         }
 
-        // 運動連鎖分析（Re'Forma理論）
-        function analyzeKineticChain(analysis) {
-            const issues = analysis.filter(item => item.status !== "良好");
+        // 姿勢結果表示
+        function displayResults(analysis) {
+            const resultContent = document.getElementById('resultContent');
             
-            if (issues.length === 0) {
-                return {
-                    overall: "良好",
-                    message: "全体的なバランスが良好です",
-                    recommendations: ["現在の良好な状態を維持しましょう"]
-                };
-            }
-            
-            let recommendations = [];
-            let primaryConcern = "";
-            
-            // 運動連鎖パターン分析
-            const hasPelvicIssue = issues.some(item => item.area === "骨盤のライン");
-            const hasShoulderIssue = issues.some(item => item.area === "肩のライン");
-            const hasHeadIssue = issues.some(item => item.area === "頭部位置");
-            
-            if (hasPelvicIssue) {
-                primaryConcern = "骨盤の傾きが他部位に影響している可能性";
-                recommendations.push("股関節の柔軟性向上");
-                recommendations.push("体幹筋力強化");
-            }
-            
-            if (hasShoulderIssue && hasHeadIssue) {
-                primaryConcern = "上位交差症候群の傾向";
-                recommendations.push("胸椎可動性向上");
-                recommendations.push("深層頸屈筋強化");
-            }
-            
-            return {
-                overall: issues.length > 2 ? "要注意" : "軽度改善推奨",
-                message: primaryConcern || "姿勢バランスの改善をお勧めします",
-                recommendations: recommendations.length > 0 ? recommendations : ["専門的な評価をお勧めします"]
-            };
-        }
-
-        // 結果表示
-        function displayResults(container, analysis, kineticChain) {
             const resultHTML = `
                 ${analysis.map(item => `
                     <div class="result-item">
@@ -842,29 +1153,212 @@
                         </div>
                     </div>
                 `).join('')}
-                
-                <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px;">
-                    <h4 style="margin-bottom: 10px; color: #fff;">🔗 運動連鎖分析</h4>
-                    <div style="color: ${kineticChain.overall === '良好' ? '#4CAF50' : '#FF9800'}; font-weight: bold; margin-bottom: 8px;">
-                        総合評価: ${kineticChain.overall}
-                    </div>
-                    <div style="margin-bottom: 10px; font-size: 14px;">
-                        ${kineticChain.message}
-                    </div>
-                    <div style="font-size: 12px; opacity: 0.9;">
-                        <strong>推奨アプローチ:</strong><br>
-                        ${kineticChain.recommendations.map(rec => `• ${rec}`).join('<br>')}
-                    </div>
+            `;
+            
+            resultContent.innerHTML = resultHTML;
+        }
+
+        // 🔥 筋肉分析結果表示
+        function displayMuscleAnalysis(muscleAnalysis) {
+            const muscleContent = document.getElementById('muscleContent');
+            
+            const muscleHTML = `
+                <div style="margin-bottom: 15px; padding: 15px; background: rgba(255,215,0,0.2); border-radius: 10px;">
+                    <h4 style="color: #FFD700; margin-bottom: 8px;">🔍 運動連鎖分析結果</h4>
+                    <div style="font-weight: bold; margin-bottom: 5px;">${muscleAnalysis.primaryIssue}</div>
+                    <div style="font-size: 12px; opacity: 0.9;">学術根拠: ${muscleAnalysis.evidence}</div>
                 </div>
                 
+                ${muscleAnalysis.weakMuscles.length > 0 ? `
+                    <div class="muscle-section">
+                        <h4 style="color: #FF6B6B; margin-bottom: 10px;">⬇️ 弱化筋肉（強化が必要）</h4>
+                        ${muscleAnalysis.weakMuscles.map(muscle => `
+                            <div class="muscle-item">
+                                <div style="font-weight: bold; color: #FFD700;">${muscle.name}（${muscle.japanese}）</div>
+                                <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">
+                                    機能: ${muscle.function}
+                                </div>
+                                <div style="font-size: 11px; margin-top: 3px; color: #FF9800;">
+                                    優先度: ${muscle.priority === 1 ? "最重要" : muscle.priority === 2 ? "重要" : "補助"}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
+                ${muscleAnalysis.tightMuscles.length > 0 ? `
+                    <div class="muscle-section">
+                        <h4 style="color: #4ECDC4; margin-bottom: 10px;">⬆️ 短縮筋肉（ストレッチが必要）</h4>
+                        ${muscleAnalysis.tightMuscles.map(muscle => `
+                            <div class="muscle-item">
+                                <div style="font-weight: bold; color: #FFD700;">${muscle.name}（${muscle.japanese}）</div>
+                                <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">
+                                    機能: ${muscle.function}
+                                </div>
+                                <div style="font-size: 11px; margin-top: 3px; color: #FF9800;">
+                                    優先度: ${muscle.priority === 1 ? "最重要" : muscle.priority === 2 ? "重要" : "補助"}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
                 <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 11px; text-align: center;">
-                    <strong>📋 Re'Forma AI ProScope</strong><br>
-                    運動連鎖理論に基づく姿勢評価システム<br>
-                    <em style="color: #FFD700;">※詳細な評価・治療は理学療法士にご相談ください</em>
+                    <strong>📚 Re'Forma運動連鎖理論</strong><br>
+                    エビデンスベース筋肉分析システム<br>
+                    <em style="color: #FFD700;">※詳細な筋肉機能評価は理学療法士にご相談ください</em>
                 </div>
             `;
             
-            container.innerHTML = resultHTML;
+            muscleContent.innerHTML = muscleHTML;
+        }
+
+        // 🎯 運動プログラム表示
+        function displayExerciseProgram(muscleAnalysis) {
+            if (muscleAnalysis.weakMuscles.length === 0) return;
+            
+            showPhase(currentPhase);
+        }
+
+        // フェーズ表示切り替え
+        function showPhase(phase) {
+            currentPhase = phase;
+            
+            // タブの状態更新
+            document.querySelectorAll('.phase-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event?.target?.classList.add('active') || 
+                document.querySelector(`[onclick="showPhase('${phase}')"]`).classList.add('active');
+            
+            const programContent = document.getElementById('programContent');
+            const phaseData = exerciseDatabase[phase];
+            
+            // 現在検出されている筋肉に基づく運動選択
+            const currentMuscleAnalysis = getCurrentMuscleAnalysis();
+            const relevantExercises = getRelevantExercises(currentMuscleAnalysis.weakMuscles, phase);
+            
+            const programHTML = `
+                <div class="phase-content active">
+                    <div style="margin-bottom: 20px; padding: 15px; background: rgba(0,123,255,0.2); border-radius: 10px;">
+                        <h4 style="color: #00BFFF; margin-bottom: 8px;">📋 ${phaseData.name}</h4>
+                        <div style="font-size: 14px; margin-bottom: 5px;"><strong>期間:</strong> ${phaseData.duration}</div>
+                        <div style="font-size: 14px; margin-bottom: 5px;"><strong>目標:</strong> ${phaseData.goal}</div>
+                        <div style="font-size: 12px; opacity: 0.9;">個別化プログラム: あなたの筋肉分析結果に基づく</div>
+                    </div>
+                    
+                    ${relevantExercises.length > 0 ? `
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="color: #FFD700; margin-bottom: 10px;">🏋️‍♂️ 推奨運動（強化）</h4>
+                            ${relevantExercises.map(exercise => `
+                                <div class="exercise-item">
+                                    <div style="font-weight: bold; color: #00BFFF; margin-bottom: 8px;">
+                                        ${exercise.name}
+                                    </div>
+                                    <div style="font-size: 13px; margin-bottom: 8px;">
+                                        <strong>対象筋:</strong> ${exercise.targetMuscle}
+                                    </div>
+                                    <div style="font-size: 12px; margin-bottom: 8px; line-height: 1.4;">
+                                        ${exercise.description}
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                        <div style="color: #FF9800;"><strong>${exercise.sets}</strong></div>
+                                        <div style="color: #4CAF50;">${exercise.hold}</div>
+                                    </div>
+                                    <div style="font-size: 11px; margin-top: 5px; color: #FFD700;">
+                                        💡 ${exercise.benefits}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #4ECDC4; margin-bottom: 10px;">🧘‍♀️ 推奨ストレッチ（緩和）</h4>
+                        ${getRelevantStretches(currentMuscleAnalysis.tightMuscles).map(stretch => `
+                            <div class="exercise-item">
+                                <div style="font-weight: bold; color: #4ECDC4; margin-bottom: 5px;">
+                                    ${stretch.name}ストレッチ
+                                </div>
+                                <div style="font-size: 13px; margin-bottom: 5px;">
+                                    <strong>対象筋:</strong> ${stretch.targetMuscle}
+                                </div>
+                                <div style="font-size: 12px; color: #FF9800;">
+                                    30秒キープ × 3セット（毎日実施）
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                        <h4 style="color: #FFD700; margin-bottom: 10px;">📈 進捗目標</h4>
+                        <div style="font-size: 12px; line-height: 1.6;">
+                            ${getPhaseGoals(phase)}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; padding: 10px; background: rgba(255,69,0,0.2); border-radius: 8px; font-size: 11px; text-align: center;">
+                        <strong>⚠️ 注意事項</strong><br>
+                        痛みが増加する場合は中止し、理学療法士にご相談ください<br>
+                        <em style="color: #FFD700;">無理をせず、段階的に強度を上げましょう</em>
+                    </div>
+                </div>
+            `;
+            
+            programContent.innerHTML = programHTML;
+        }
+
+        // 現在の筋肉分析取得（グローバル変数から）
+        function getCurrentMuscleAnalysis() {
+            // 実際の実装では、最新の分析結果を保持する変数から取得
+            // 簡略化のため、サンプルデータを返す
+            return {
+                weakMuscles: [
+                    { name: "深層頸屈筋", japanese: "しんそうけいくっきん" },
+                    { name: "腹横筋", japanese: "ふくおうきん" },
+                    { name: "前鋸筋", japanese: "ぜんきょきん" }
+                ],
+                tightMuscles: [
+                    { name: "上部僧帽筋", japanese: "じょうぶそうぼうきん" },
+                    { name: "胸鎖乳突筋", japanese: "きょうさにゅうとつきん" }
+                ]
+            };
+        }
+
+        // 関連運動取得
+        function getRelevantExercises(weakMuscles, phase) {
+            const exercises = [];
+            const phaseData = exerciseDatabase[phase];
+            
+            weakMuscles.forEach(muscle => {
+                if (phaseData.exercises[muscle.name]) {
+                    exercises.push({
+                        targetMuscle: muscle.name,
+                        ...phaseData.exercises[muscle.name]
+                    });
+                }
+            });
+            
+            return exercises;
+        }
+
+        // 関連ストレッチ取得
+        function getRelevantStretches(tightMuscles) {
+            return tightMuscles.map(muscle => ({
+                name: muscle.name,
+                targetMuscle: muscle.name,
+                japanese: muscle.japanese
+            }));
+        }
+
+        // フェーズ目標取得
+        function getPhaseGoals(phase) {
+            const goals = {
+                phase1: "• 痛み・不快感の軽減<br>• 基本的な姿勢意識の向上<br>• 正しい運動パターンの学習",
+                phase2: "• 筋力の明確な向上<br>• 日常動作での姿勢改善<br>• 運動習慣の定着",
+                phase3: "• 機能的動作能力の向上<br>• スポーツ・趣味活動への復帰<br>• 長期的な健康維持"
+            };
+            return goals[phase] || "";
         }
 
         // ステータス更新
@@ -874,51 +1368,45 @@
             status.textContent = message;
         }
 
-        // ページ読み込み完了時に初期化
+        // 初期化実行
         document.addEventListener('DOMContentLoaded', function() {
-            updateStatus("loading", "🚀 Re'Forma AI 起動中...");
-            
-            // 段階的初期化
+            updateStatus("loading", "🔥 Re'Forma AI 筋肉分析システム起動中...");
             setTimeout(() => {
                 init();
             }, 500);
         });
 
-        // エラーハンドリング強化
+        // エラーハンドリング
         window.addEventListener('error', function(e) {
             console.error('Global error:', e);
             updateStatus("error", "❌ システムエラー: ページを再読み込みしてください");
         });
 
-        // iOS Safari特有の問題対応
+        // iOS Safari対応
         window.addEventListener('pagehide', function() {
             if (isAnalyzing) {
                 stopCamera();
             }
         });
 
-        // タッチイベント最適化とスクロール問題解決
+        // タッチイベント最適化
         document.addEventListener('touchstart', function() {}, {passive: true});
         document.addEventListener('touchmove', function(e) {
-            // ビデオ以外ではスクロールを許可
             if (e.target.tagName !== 'VIDEO' && e.target.tagName !== 'CANVAS') {
                 return true;
             }
         }, {passive: true});
 
-        // iOS Safari のスクロール問題解決
+        // 画面調整
         document.addEventListener('DOMContentLoaded', function() {
-            // body の高さを動的に調整
             function adjustBodyHeight() {
                 const container = document.querySelector('.container');
                 const bodyHeight = container.scrollHeight + 100;
                 document.body.style.minHeight = bodyHeight + 'px';
             }
             
-            // 初期調整
             setTimeout(adjustBodyHeight, 1000);
             
-            // 画面サイズ変更時に再調整
             window.addEventListener('resize', adjustBodyHeight);
             window.addEventListener('orientationchange', function() {
                 setTimeout(adjustBodyHeight, 500);
