@@ -269,6 +269,9 @@
             <button id="stopBtn" class="btn" onclick="stopCamera()" style="display:none;">
                 ⏹️ 停止
             </button>
+            <button id="switchBtn" class="btn" onclick="switchCamera()" style="display:none;">
+                🔄 リアカメラ
+            </button>
             <button id="debugBtn" class="btn" onclick="toggleDebug()" style="display:none;">
                 🔧 デバッグ
             </button>
@@ -306,6 +309,9 @@
         let debugMode = false;
         let detectionCount = 0;
         let lastDetectionTime = 0;
+        let landmarkBuffer = []; // 安定化バッファ
+        const BUFFER_SIZE = 5;   // 5フレーム平均
+        let currentCameraMode = 'user'; // カメラモード
 
         // MediaPipe CDN URLs (HTTPSで確実に動作するように)
         const MEDIAPIPE_CDN = 'https://cdn.jsdelivr.net/npm/@mediapipe/';
@@ -440,14 +446,15 @@
                     }
                 });
 
-                // iOS/Safari向け最適化設定
+                // iPhone向け最適化設定
                 pose.setOptions({
-                    modelComplexity: isIOS ? 0 : 1, // iOSでは軽量モード
+                    modelComplexity: isIOS ? 1 : 1, // 品質重視
                     smoothLandmarks: true,
                     enableSegmentation: false,
                     smoothSegmentation: false,
-                    minDetectionConfidence: isIOS ? 0.5 : 0.6,
-                    minTrackingConfidence: isIOS ? 0.4 : 0.5
+                    minDetectionConfidence: 0.8, // 精度向上: 0.6 → 0.8
+                    minTrackingConfidence: 0.7,  // 精度向上: 0.5 → 0.7
+                    staticImageMode: false       // 動画モード最適化
                 });
 
                 pose.onResults(onResults);
